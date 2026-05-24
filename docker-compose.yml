@@ -1,0 +1,49 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    networks:
+      - mini-network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+
+    
+
+  postgres:
+    image: postgres:16
+    container_name: mini-postgres
+    environment:
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: app_password
+      POSTGRES_DB: app_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - mini-network
+    restart: unless-stopped
+
+  
+  redis:
+    image: redis:latest
+    container_name: mini-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - mini-network
+    restart: unless-stopped
+
+  
+volumes:
+  postgres-data:
+
+networks:
+  mini-network:
