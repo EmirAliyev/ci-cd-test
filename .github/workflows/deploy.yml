@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Build and Push Image
 
 on:
   push:
@@ -17,6 +17,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set image name
+        run: |
+          IMAGE_NAME=$(echo "ghcr.io/${{ github.repository }}/backend:latest" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
+          echo "Image name: $IMAGE_NAME"
+
       - name: Login to GHCR
         uses: docker/login-action@v4
         with:
@@ -27,9 +33,9 @@ jobs:
       - name: Build image
         run: |
           docker build \
-            -t ghcr.io/${{ github.repository }}/backend:latest \
-            ./backend
+            -t $IMAGE_NAME \
+            .
 
       - name: Push image
         run: |
-          docker push ghcr.io/${{ github.repository }}/backend:latest
+          docker push $IMAGE_NAME
